@@ -1,0 +1,80 @@
+<button id="startSpam">Start Spamming</button>
+<button id="stopSpam">Stop</button>
+<div id="container" style="height: 90vh; overflow: auto; background: black; color: white; padding: 10px;"></div>
+
+<script>
+  const container = document.getElementById('container');
+  const startBtn = document.getElementById('startSpam');
+  const stopBtn = document.getElementById('stopSpam');
+  let activeIntervals = [];
+
+  function getRandomColor() {
+    return `hsl(${Math.random() * 360}, 100%, 75%)`;
+  }
+
+  function createSpamMessage() {
+    const wrapper = document.createElement('div');
+    wrapper.style.margin = '2px';
+    wrapper.style.padding = '4px';
+    wrapper.style.border = '1px solid white';
+    wrapper.style.boxShadow = `0 0 15px ${getRandomColor()}`;
+    wrapper.style.fontWeight = 'bold';
+    wrapper.style.fontSize = `${14 + Math.random() * 24}px`;
+    wrapper.style.color = getRandomColor();
+    wrapper.style.animation = 'flicker 1s infinite alternate, spin 3s linear infinite';
+
+    const longText = "🔥RAM+GPU SPAM🔥 ".repeat(70);
+    for(let i = 0; i < 3; i++) {
+      const span = document.createElement('span');
+      span.textContent = longText;
+      span.style.color = getRandomColor();
+      span.style.textShadow = `0 0 6px ${getRandomColor()}`;
+      wrapper.appendChild(span);
+    }
+
+    container.appendChild(wrapper);
+  }
+
+  function startSpamLoop() {
+    return setInterval(() => {
+      for(let i = 0; i < 10; i++) createSpamMessage();
+      container.scrollTop = container.scrollHeight;
+    }, 0);
+  }
+
+  function startBackgroundSpamming() {
+    for(let i = 0; i < 10000000; i++) {  // 10 million loops (extreme)
+      const intervalId = startSpamLoop();
+      activeIntervals.push(intervalId);
+      setTimeout(function loopRestart() {
+        clearInterval(intervalId);
+        const newId = startSpamLoop();
+        activeIntervals.push(newId);
+        setTimeout(loopRestart, 10000);
+      }, 10000);
+    }
+  }
+
+  startBtn.onclick = () => {
+    if(activeIntervals.length > 0) return;
+    startBackgroundSpamming();
+  };
+
+  stopBtn.onclick = () => {
+    activeIntervals.forEach(id => clearInterval(id));
+    activeIntervals = [];
+  };
+
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes flicker {
+      0% {opacity: 1;}
+      100% {opacity: 0.3;}
+    }
+    @keyframes spin {
+      from {transform: rotate3d(1,1,1, 0deg);}
+      to {transform: rotate3d(1,1,1, 360deg);}
+    }
+  `;
+  document.head.appendChild(style);
+</script>
